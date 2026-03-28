@@ -9,16 +9,14 @@ import { InsightsView } from '@/components/InsightsView';
 import { SettingsView } from '@/components/SettingsView';
 
 function App() {
-  const [apiStatus, setApiStatus] = useState("Connecting to backend...");
   const [showProfile, setShowProfile] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(() => sessionStorage.getItem('isAuthenticated') === 'true');
+  const [passwordInput, setPasswordInput] = useState("");
+  const [error, setError] = useState("");
   const { activeTab, setUser, setCycles, setPredictions, user } = useAppStore();
 
   useEffect(() => {
-    // Quick API hit to demonstrate it's working
-    fetch('http://localhost:4000/api/health')
-      .then(res => res.json())
-      .then(data => setApiStatus("Backend Status: " + data.status))
-      .catch(() => setApiStatus("Backend Status: Offline (Start the BE module)"));
+    if (!isAuthenticated) return;
 
     // Fetch mock user and cycle data
     fetch('http://localhost:4000/api/user')
@@ -36,7 +34,51 @@ function App() {
       .then(data => setPredictions(data.predictions))
       .catch(console.error);
 
-  }, [setUser, setCycles, setPredictions]);
+  }, [isAuthenticated, setUser, setCycles, setPredictions]);
+
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-[100dvh] flex items-center justify-center bg-[var(--color-background)] text-[var(--color-foreground)] font-sans antialiased">
+        <div className="bg-white/60 backdrop-blur-xl p-8 rounded-3xl shadow-xl border border-[var(--color-sand)] flex flex-col items-center max-w-sm w-full mx-4">
+          <h2 className="text-2xl font-medium tracking-tight text-[var(--color-slate)] mb-6">Enter Password</h2>
+          <input
+            type="password"
+            className="w-full px-4 py-3 rounded-xl border border-[var(--color-sand)] bg-white/50 focus:outline-none focus:ring-2 focus:ring-[var(--color-sage)]/50 transition-shadow mb-4 text-center text-lg"
+            placeholder="Secret word..."
+            value={passwordInput}
+            onChange={(e) => {
+              setPasswordInput(e.target.value);
+              setError("");
+            }}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                if (passwordInput === import.meta.env.VITE_APP_PASSWORD) {
+                  sessionStorage.setItem('isAuthenticated', 'true');
+                  setIsAuthenticated(true);
+                } else {
+                  setError("Incorrect password");
+                }
+              }
+            }}
+          />
+          {error && <p className="text-rose-500 text-sm mb-4">{error}</p>}
+          <button
+            className="w-full py-3 bg-[var(--color-sage)] text-white rounded-xl font-medium shadow-md hover:opacity-90 transition-opacity"
+            onClick={() => {
+              if (passwordInput === import.meta.env.VITE_APP_PASSWORD) {
+                sessionStorage.setItem('isAuthenticated', 'true');
+                setIsAuthenticated(true);
+              } else {
+                setError("Incorrect password");
+              }
+            }}
+          >
+            Unlock
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-[100dvh] bg-[var(--color-background)] text-[var(--color-foreground)] pb-24 font-sans antialiased overflow-x-hidden relative">

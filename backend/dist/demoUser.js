@@ -37,10 +37,10 @@ export const demoUser = {
     partnerLinksAsPrimary: [],
     partnerLinksAsPartner: [],
 };
-
 export const demoPrediction = {
     user_id: 'u1',
     start_date: new Date('2026-04-26'),
     end_date: new Date('2026-04-30'),
     confidence_interval_days: 5
 };
+//# sourceMappingURL=demoUser.js.map

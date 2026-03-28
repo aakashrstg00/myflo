@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Shield, Bell, Download, Trash2, LogOut, Users, PlusCircle, X } from 'lucide-react';
+import { Bell, LogOut, Users, PlusCircle, X } from 'lucide-react';
 
 export const SettingsView = () => {
     const [isLoggingModalOpen, setIsLoggingModalOpen] = useState(false);
@@ -40,7 +40,10 @@ export const SettingsView = () => {
                         <div className="glass-card divide-y divide-[var(--color-sand)]">
                             <SettingItem icon={<Users size={20} />} label="Partner Sharing" text="Manage invited partners" />
                             <SettingItem icon={<Bell size={20} />} label="Notifications" text="Push and email settings" />
-                            <SettingItem className="text-red-500" icon={<LogOut size={20} />} label="Sign out" text="Sign out of your account" />
+                            <SettingItem className="text-red-500" icon={<LogOut size={20} />} label="Sign out" text="Sign out of your account" onClick={() => {
+                                sessionStorage.removeItem('isAuthenticated');
+                                window.location.reload();
+                            }} />
                         </div>
                     </div>
 
@@ -194,9 +197,9 @@ const PastCycleModal = ({ onClose }: { onClose: () => void }) => {
     );
 };
 
-const SettingItem = ({ icon, label, text, className }: { icon: React.ReactNode, label: string, text: string, className?: string }) => {
+const SettingItem = ({ icon, label, text, className, onClick }: { icon: React.ReactNode, label: string, text: string, className?: string, onClick?: () => void }) => {
     return (
-        <div className={`p-4 flex items-center space-x-4 cursor-pointer hover:bg-[var(--color-sand)]/30 transition-colors group ${className || ''}`}>
+        <div onClick={onClick} className={`p-4 flex items-center space-x-4 cursor-pointer hover:bg-[var(--color-sand)]/30 transition-colors group ${className || ''}`}>
             <div className={`${className || 'text-[var(--color-slate)]'} group-hover:text-[var(--color-terracotta)] transition-colors`}>{icon}</div>
             <div>
                 <div className={`font-medium ${className || 'text-[var(--color-slate)]'}`}>{label}</div>
